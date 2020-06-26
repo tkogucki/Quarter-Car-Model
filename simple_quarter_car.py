@@ -1,6 +1,8 @@
 import numpy as np
 import matplotlib.pyplot as plt
 from scipy.integrate import odeint
+from input.py import vehicle
+
 
 k_s = 70050 # N/m
 k_t = 70050 # N/m
