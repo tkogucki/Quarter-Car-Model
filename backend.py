@@ -8,27 +8,47 @@ def l(df, i, string):
 # vehicle parameter class
 class vehicle:
     # import function for class
-    def __init__(self,df):
+    def __init__(self,df, file):
         df = df.set_index('Parameter')
-        v = 'Value'
-        ind = df.index
-        self.t_k = l(df,0,v)
-        self.f_k = l(df, 1, v)
-        self.r_k = l(df, 2, v)
-        self.f_damp = l(df, 3, v)
-        self.r_damp = l(df, 4, v)
-        self.f_usprung = l(df, 5, v)
-        self.r_usprung = l(df, 6, v)
-        self.f_sprung = l(df, 7, v)
-        self.r_sprung = l(df, 8, v)
+        self.file = file
+        self.front = vehicle.axles(df, 'front', self)
+        self.rear = vehicle.axles(df, 'rear', self)
+    # sublass for the parameters on each axle
+    class axles:
+        def __init__(self, df, axle, car):
+            v = 'Value'
+            if axle == 'front':
+                self.kt = l(df, 1, v) * 12
+                self.k = l(df, 2,v) * 12
+                self.damp = vehicle.damper(car, l(df, 3, v))
+                self.usprung = l(df, 5, v)
+                self.sprung = l(df, 7, v)
+            elif axle == 'rear':
+                self.kt = l(df, 1, v) * 12
+                self.k = l(df, 3,v) * 12
+                self.damp = vehicle.damper(car, l(df, 4, v))
+                self.usprung = l(df, 6, v)
+                self.sprung = l(df, 8, v)
+
+    # sub class of vehicle that describes the dampers
+    class damper:
+        # takes in input of car class, and targeted sheet for extraction of data
+        def __init__(self, car, damp_val):
+            pd_damper = pd.read_excel(car.file, header = 0, sheet_name = damp_val)
+            self.speed = pd_damper['Speed'] * 1/12
+            self.force = pd_damper['Force'] * 1/12
+
 
 # generation of a vehicle
 def vehicle_generator(file):
     param_df = pd.read_excel(file, header = 0, sheet_name = 'Driver')
-    car = vehicle(param_df)
+    car = vehicle(param_df, file)
     return car
 
 # write your test code here and execute
 if __name__ == '__main__':
     car = vehicle_generator('driver.xlsx')
-    print(car)
+    print(car.rear.usprung)
+    print(car.front.damp.speed)
+    for i,val in enumerate(car.front.damp.speed):
+        print(i,val)
