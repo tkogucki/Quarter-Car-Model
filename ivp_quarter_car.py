@@ -30,6 +30,7 @@ def lin_interp(axle, speed):
     upper_val = 0
     lower_val = 0
     speed_val = abs(speed)
+    sign = speed/speed_val
     print(f'The current speed is {speed}')
     length = axle.damp.length
     if speed == 0:
@@ -37,14 +38,14 @@ def lin_interp(axle, speed):
     elif (speed_val > 1.2 * axle.damp.speed.iloc[length-1]):
         delta_speed = speed_val - axle.damp.speed.iloc[length - 1]
         force = axle.damp.max_damp
-        force = speed/speed_val * force
+        force = sign * force
         print('1.2 Speed Limit Hit')
         return float(force)
     # linearly extrapolates last damping value
     elif (axle.damp.speed.iloc[length-1] <= speed_val):
         delta_speed = speed_val - axle.damp.speed.iloc[length - 1]
         force = delta_speed * axle.damp.slope
-        force = speed/speed_val * force # this is in order to ensure the sign is correct of damping
+        force = sign * force # this is in order to ensure the sign is correct of damping
         print('Extrapolation')
 
         return float(force)
@@ -64,7 +65,7 @@ def lin_interp(axle, speed):
         math_2 = (axle.damp.force.iloc[upper_ind] - axle.damp.force.iloc[upper_ind - 1])
         math_3 = axle.damp.speed.iloc[upper_ind] - axle.damp.speed.iloc[upper_ind-1]
         force = (math_1 * math_2)/math_3 + axle.damp.force.iloc[upper_ind-1]
-        force = speed/speed_val * force # this is in order to ensure the sign is correct of damping
+        force = sign * force # this is in order to ensure the sign is correct of damping
 
         return float(force)
 
