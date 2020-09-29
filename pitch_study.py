@@ -5,6 +5,8 @@ import pandas as pd
 import math
 import cmath
 
+# Equations pulled from Blevin's
+
 g_c = 32.17 
 
 kf = 350 * 2 # lbs/in
